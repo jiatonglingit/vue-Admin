@@ -25,7 +25,7 @@
             <el-input v-model.number="ruleForm.code"></el-input>
               </el-col>
               <el-col :span="9">
-                <el-button type="success" class="block" @click="GetCode()">获取验证码</el-button>
+                <el-button type="success" class="block">获取验证码</el-button>
               </el-col>
             </el-row>
           </el-form-item>
@@ -37,12 +37,9 @@
     </div>
 </template>
 <script>
-import { GetSms } from '@/api/login'
-import { reactive,ref,isRef,toRefs,onMounted } from '@vue/composition-api'
-import { stripscript,validateEmail,validatePwd,validateCd } from '@/utils/validate.js'
+import { stripscript,validateEmail,validatePwd,validateCd } from '@/uitls/validate.js'
 export default {
-  //setup(prop,context){}
-    setup(prop,{ refs }){
+    data(){
       //验证用户名
       var validateUsername = (rule, value, callback) => {
         if (value === '') {
@@ -56,8 +53,8 @@ export default {
       //验证密码
       var validatePassword = (rule, value, callback) => {
         //过滤后的数据
-      ruleForm.password=stripscript(value)
-       value=ruleForm.password 
+       this.ruleForm.password=stripscript(value)
+       value=this.ruleForm.password 
         if (value === '') {
           callback(new Error('请输入密码'));
         } else if (validatePwd(value)) {
@@ -68,13 +65,13 @@ export default {
       };
       //验证重复密码
       var validatePasswords = (rule, value, callback) => {
-        if(mode.value=='login'){callback()}
+        if(this.mode=='login'){callback()}
         //过滤后的数据
-       ruleForm.passwords=stripscript(value)
-       value=ruleForm.passwords 
+       this.ruleForm.passwords=stripscript(value)
+       value=this.ruleForm.passwords 
         if (value === '') {
           callback(new Error('请再次输入密码'));
-        } else if (value!=ruleForm.password) {
+        } else if (value!=this.ruleForm.password) {
           callback(new Error('两次密码输入不一致'));
         } else {
           callback();
@@ -89,29 +86,22 @@ export default {
           callback()
         }
       };
-      /**
-       * 这里面放置data数据，生命周期，自定义的函数
-       */
-     const menuTab=reactive([
+      return{
+        menuTab:[
           {txt:'登录',current:true,type:'login'},
           {txt:'注册',current:false,type:'register'}
-        ])
-      //模块值
-      const mode=ref('login') 
-      /**
-       * 验证规则
-       */
-      const ruleForm=reactive({
+        ],
+         ruleForm: {
           username: '',
           password: '',
           passwords:'',
-          code: '' 
-        })
-       const rules=reactive({
+          code: ''
+        },
+        rules: {
           username: [
             { validator: validateUsername, trigger: 'blur' }
           ],
-          password: [ 
+          password: [
             { validator: validatePassword, trigger: 'blur' }
           ],
            passwords: [
@@ -120,22 +110,23 @@ export default {
           code: [
             { validator: validateCode, trigger: 'blur' }
           ]
-        })
-
-
-      /**
-       * 声明函数
-       *
-       */
-       const toggleMenu=(data=>{
-         mode.value=data.type
-        menuTab.forEach(elme=>{
+        },
+        mode:'login'
+    
+      }
+    },
+    created(){},
+    methods:{
+      toggleMenu(data){
+        // console.log(data)
+        this.mode=data.type
+        this.menuTab.forEach(elme=>{
           elme.current=false
         })
         data.current=true
-       })
-     const submitForm=(formName=>{
-       refs[formName].validate((valid) => {
+      },
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
           if (valid) {
             alert('submit!');
           } else {
@@ -143,16 +134,8 @@ export default {
             return false;
           }
         });
-     })
-     const GetCode=(()=>{
-       GetSms({username:ruleForm.username})
-     })   
-      return{
-      menuTab,mode,ruleForm,rules,toggleMenu,submitForm,GetCode
-
+      }
     }
-    }
-   
     
 }
 </script>
