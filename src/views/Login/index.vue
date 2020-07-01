@@ -30,7 +30,7 @@
             </el-row>
           </el-form-item>
           <el-form-item>
-            <el-button type="danger" @click="submitForm('ruleForm')" class="block" id="blocktred">提交</el-button>
+            <el-button type="danger" @click="submitForm('ruleForm')" class="block" id="blocktred" :disabled="loginButtonStatus">{{mode ==="login" ? '登录' :'注册'}}</el-button>
           </el-form-item>
           </el-form>
       </div>
@@ -41,8 +41,16 @@ import { GetSms } from '@/api/login'
 import { reactive,ref,isRef,toRefs,onMounted } from '@vue/composition-api'
 import { stripscript,validateEmail,validatePwd,validateCd } from '@/utils/validate.js'
 export default {
-  //setup(prop,context){}
-    setup(prop,{ refs }){
+    // setup(prop,context){
+    setup(prop,{ refs,root }){
+      // console.log(context)
+      // attrs: (...)  this.$attrs
+      // emit: (...)    this.$emit
+      // isServer: (...)  this.$iServer
+      // listeners: (...) this.$Listeners
+      // parent: (...)  this.$parent
+      // refs: (...) this.$refs
+      // root: (...) this
       //验证用户名
       var validateUsername = (rule, value, callback) => {
         if (value === '') {
@@ -98,6 +106,8 @@ export default {
         ])
       //模块值
       const mode=ref('login') 
+      //登录按钮禁用状态
+      const loginButtonStatus=ref(true)
       /**
        * 验证规则
        */
@@ -145,10 +155,21 @@ export default {
         });
      })
      const GetCode=(()=>{
-       GetSms({username:ruleForm.username})
+       //进行提示
+      //  if(ruleForm.username == ''){
+      //    root.$message.error('邮箱不能为空！');
+      //    return false
+      //  }
+       //请求的接口
+       GetSms({username:ruleForm.username}).then(response=>{
+         console.log(response)
+       }).catch(error=>{
+         console.log(error);
+         
+       })
      })   
       return{
-      menuTab,mode,ruleForm,rules,toggleMenu,submitForm,GetCode
+      menuTab,mode,loginButtonStatus,ruleForm,rules,toggleMenu,submitForm,GetCode
 
     }
     }
@@ -165,7 +186,7 @@ export default {
   width: 330px;
   margin: auto;
 }
-.menu-tab{
+.menu-tab{ 
 text-align: center;
 li{
   display: inline-block;
