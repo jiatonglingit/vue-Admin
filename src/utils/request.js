@@ -3,9 +3,8 @@ import { Message } from 'element-ui';
 
 const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/devApi';
 const service = axios.create({
-    //   baseURL: 'https:/www.web.jshtml.cn/productApi',
-    baseURL: BASEURL,
-    timeout: 1000,
+    baseURL: BASEURL, //   baseURL: 'https:/www.web.jshtml.cn/productApi',
+    timeout: 15000, //请求超时时间
 });
 // 添加请求拦截器
 service.interceptors.request.use(function(config) {

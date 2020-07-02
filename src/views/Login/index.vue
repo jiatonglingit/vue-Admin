@@ -25,7 +25,7 @@
             <el-input v-model.number="ruleForm.code"></el-input>
               </el-col>
               <el-col :span="9">
-                <el-button type="success" class="block" @click="GetCode()">获取验证码</el-button>
+                <el-button type="success" class="block" @click="GetCode()" :disabled="codeButtonStatus.status">{{codeButtonStatus.text}}</el-button>
               </el-col>
             </el-row>
           </el-form-item>
@@ -37,7 +37,7 @@
     </div>
 </template>
 <script>
-import { GetSms } from '@/api/login'
+import { GetSms,Register } from '@/api/login'
 import { reactive,ref,isRef,toRefs,onMounted } from '@vue/composition-api'
 import { stripscript,validateEmail,validatePwd,validateCd } from '@/utils/validate.js'
 export default {
@@ -100,7 +100,7 @@ export default {
       /**
        * 这里面放置data数据，生命周期，自定义的函数
        */
-     const menuTab=reactive([
+      const menuTab=reactive([
           {txt:'登录',current:true,type:'login'},
           {txt:'注册',current:false,type:'register'}
         ])
@@ -108,6 +108,15 @@ export default {
       const mode=ref('login') 
       //登录按钮禁用状态
       const loginButtonStatus=ref(true)
+      //获取验证码禁用状态,文字
+      const codeButtonStatus=reactive(
+        {
+          status:false,
+          text:'发送验证码'
+        }
+      )
+      //定时器
+      const timer=ref(null)
       /**
        * 验证规则
        */
@@ -138,16 +147,33 @@ export default {
        *
        */
        const toggleMenu=(data=>{
-         mode.value=data.type
         menuTab.forEach(elme=>{
           elme.current=false
         })
         data.current=true
+        //更改模块值
+         mode.value=data.type
+        // this.$refs[formName].resetFields(); 2.0
+        refs.ruleForm.resetFields();//重置表单项
        })
      const submitForm=(formName=>{
        refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit!');
+           let requestData={
+            username:ruleForm.username,
+            password:ruleForm.password,
+            code:ruleForm.code
+            }
+            Register(requestData).then((response)=>{
+             console.log(response.data)
+               root.$message({ 
+              message:response.data.message,
+              type: 'success'
+            });
+            }).catch((error)=>{
+              console.log(error)
+              
+            })
           } else {
             console.log('error submit!!');
             return false;
@@ -156,20 +182,58 @@ export default {
      })
      const GetCode=(()=>{
        //进行提示
-      //  if(ruleForm.username == ''){
-      //    root.$message.error('邮箱不能为空！');
-      //    return false
-      //  }
+       if(ruleForm.username == ''){
+         root.$message.error('邮箱不能为空！');
+         return false
+       }
+
+       //验证邮箱格式
+       if(validateEmail(ruleForm.username)){
+         root.$message.error('用户名输入错误');
+         return false
+       }
+       let requestData={
+         username:ruleForm.username,
+         module: mode.value
+       }  
+       //修改获取验证码的登录状态
+       codeButtonStatus.status=true
+       //更改按钮文字
+       codeButtonStatus.text='发送中'
        //请求的接口
-       GetSms({username:ruleForm.username}).then(response=>{
-         console.log(response)
-       }).catch(error=>{
-         console.log(error);
-         
-       })
-     })   
+       setTimeout(()=>{
+          GetSms(requestData).then(response=>{
+             console.log(response.data)
+              root.$message({ 
+              message: '验证码发送成功',
+              type: 'success'
+            });
+            //启用登录注册功能
+            loginButtonStatus.value=false
+            //开启倒计时定时器
+            codeDown(5)
+          }).catch(error=>{
+            console.log(error);
+            
+          })
+          },3000)
+         })  
+         const codeDown=((number)=>{
+           let time=number
+          timer.value=setInterval(()=>{
+             time--;
+             if(time === 0){
+               clearInterval(timer.value)
+               codeButtonStatus.status=false
+               codeButtonStatus.text='再次获取'
+             }else{
+               codeButtonStatus.text=`${time}秒`
+             }
+
+           },1000)
+         }) 
       return{
-      menuTab,mode,loginButtonStatus,ruleForm,rules,toggleMenu,submitForm,GetCode
+      menuTab,mode,loginButtonStatus,codeButtonStatus,ruleForm,rules,toggleMenu,submitForm,GetCode
 
     }
     }
