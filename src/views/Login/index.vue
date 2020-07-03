@@ -22,7 +22,7 @@
             <label>验证码</label>
             <el-row :gutter="10">
               <el-col :span="15">
-            <el-input v-model.number="ruleForm.code"></el-input>
+            <el-input v-model="ruleForm.code"></el-input>
               </el-col>
               <el-col :span="9">
                 <el-button type="success" class="block" @click="GetCode()" :disabled="codeButtonStatus.status">{{codeButtonStatus.text}}</el-button>
@@ -37,7 +37,7 @@
     </div>
 </template>
 <script>
-import { GetSms,Register } from '@/api/login'
+import { GetSms,Register,Login } from '@/api/login'
 import { reactive,ref,isRef,toRefs,onMounted } from '@vue/composition-api'
 import { stripscript,validateEmail,validatePwd,validateCd } from '@/utils/validate.js'
 export default {
@@ -159,21 +159,7 @@ export default {
      const submitForm=(formName=>{
        refs[formName].validate((valid) => {
           if (valid) {
-           let requestData={
-            username:ruleForm.username,
-            password:ruleForm.password,
-            code:ruleForm.code
-            }
-            Register(requestData).then((response)=>{
-             console.log(response.data)
-               root.$message({ 
-              message:response.data.message,
-              type: 'success'
-            });
-            }).catch((error)=>{
-              console.log(error)
-              
-            })
+            mode.value ==='login' ? login() : register()
           } else {
             console.log('error submit!!');
             return false;
@@ -211,13 +197,16 @@ export default {
             //启用登录注册功能
             loginButtonStatus.value=false
             //开启倒计时定时器
-            codeDown(5)
+            codeDown(30)
           }).catch(error=>{
             console.log(error);
             
           })
           },3000)
-         })  
+         }) 
+         /**
+          * 定时器
+           */ 
          const codeDown=((number)=>{
            let time=number
           timer.value=setInterval(()=>{
@@ -231,7 +220,55 @@ export default {
              }
 
            },1000)
-         }) 
+         })
+         //注册成功后更改状态
+         const clearCountDown =(()=>{
+           //还原验证码默认状态
+           codeButtonStatus.status=false
+           codeButtonStatus.text='获取验证码'
+           clearInterval(timer.value)
+         })
+         /**
+          * 登录
+          */
+         const login=(()=>{
+           let requestData={
+            username:ruleForm.username,
+            password:ruleForm.password,
+            code:ruleForm.code
+            }
+            Login(requestData).then((response)=>{
+              console.log(response)
+               root.$message({ 
+              message:response.data.message,
+              type: 'success'
+               });
+            }).catch((error)=>{
+              console.log(error)
+            })
+         })
+         /**
+          * 注册
+          */
+         const register=(()=>{
+           let requestData={
+            username:ruleForm.username,
+            password:ruleForm.password,
+            code:ruleForm.code
+            }
+            Register(requestData).then((response)=>{
+            toggleMenu(menuTab[0])
+            clearCountDown()
+             console.log(response.data)
+               root.$message({ 
+              message:response.data.message,
+              type: 'success'
+               });
+            }).catch((error)=>{
+              console.log(error)
+              
+            })
+         })
       return{
       menuTab,mode,loginButtonStatus,codeButtonStatus,ruleForm,rules,toggleMenu,submitForm,GetCode
 
