@@ -1,14 +1,9 @@
 <template>
-  <div id="app">
-    
-  </div>
+  <div id="infocategory">信息分类</div>
 </template>
 <script>
-export default {
-    
-}
+export default {};
 </script>
 
 <style lang="scss">
-
 </style>

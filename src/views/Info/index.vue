@@ -1,9 +1,9 @@
 <template>
-  <div id="app">用户列表</div>
+  <div id="info">信息列表</div>
 </template>
 <script>
 export default {};
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 </style>
