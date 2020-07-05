@@ -15,6 +15,6 @@ export default {};
   bottom: 0;
   border: 30px solid #f7f7f7;
   border-bottom: none;
-  -webkit-box-sizing: border;
+  box-sizing: border-box;
 }
 </style>
