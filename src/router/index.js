@@ -2,7 +2,12 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
-
+// 解决ElementUI导航栏中的vue-router在3.0版本以上重复点菜单报错问题
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+    return originalPush.call(this, location).catch(err => err)
+}
+import Layout from '@/views/Layout/index'
 const routes = [{
         path: "/",
         redirect: "login",
@@ -24,15 +29,17 @@ const routes = [{
     {
         path: "/console",
         name: "Console",
+        redirect: "index",
         meta: {
+            icon: 'console',
             name: '控制台'
         },
-        component: () =>
-            import ("../views/Layout/index.vue"),
+        component: Layout,
         children: [{
             path: "/index",
             name: "Index",
             meta: {
+                icon: 'index',
                 name: '首页'
             },
             component: () =>
@@ -43,14 +50,15 @@ const routes = [{
         path: "/info",
         name: "Info",
         meta: {
+            icon: 'news',
             name: '信息管理'
         },
-        component: () =>
-            import ( /* webpackChunkName: "about" */ "../views/Layout/index.vue"),
+        component: Layout,
         children: [{
                 path: "/infoIndex",
                 name: "infoIndex",
                 meta: {
+                    icon: 'infoList',
                     name: '信息列表'
                 },
                 component: () =>
@@ -60,6 +68,7 @@ const routes = [{
                 path: "/infoCategory",
                 name: "infoCategory",
                 meta: {
+                    icon: 'infoCategory',
                     name: '信息分类'
                 },
                 component: () =>
@@ -71,14 +80,15 @@ const routes = [{
         path: "/user",
         name: "User",
         meta: {
+            icon: 'user',
             name: '用户管理'
         },
-        component: () =>
-            import ( /* webpackChunkName: "about" */ "../views/Layout/index.vue"),
+        component: Layout,
         children: [{
             path: "/userIndex",
             name: "UserIndex",
             meta: {
+                icon: 'userList',
                 name: '用户列表'
             },
             component: () =>
