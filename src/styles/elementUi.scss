@@ -6,9 +6,8 @@
     }
 }
 
-// 修改一级菜单样式
 li.el-submenu {
-    &.is-active.is-opened .el-submenu__title {
+    &.is-active.is-opened.el-submenu__title {
         background-color: $mainColor !important;
     }
 }

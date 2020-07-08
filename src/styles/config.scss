@@ -1,12 +1,14 @@
-// 定义框架宽度
-$menuWidth: 250px;
-//主颜色
-$mainColor: #f56c6c;
+// 后台框架尺寸
+// 菜单宽度
+$navMenu: 250px;
+$navMenuMin: 64px;
 $layoutHeader: 75px;
-.pull-left {
-    float: left;
-}
-
-.pull-right {
-    float: right;
+// 主颜色
+$mainColor: #f56c6c;
+@mixin webkit($type, $value) {
+    -webkit-#{$type}: $value;
+    -moz-#{$type}: $value;
+    -o-#{$type}: $value;
+    -ms-#{$type}: $value;
+    #{$type}: $value;
 }
