@@ -54,7 +54,7 @@ export default {
 		const routers = reactive(root.$router.options.routes)
 		// console.log(routers);
 		const isCollapse = computed(() => {
-			return root.$store.state.isCollapse
+			return root.$store.state.app.isCollapse
 		})
 		return {
 			routers,
@@ -91,6 +91,25 @@ export default {
 .close {
 	#nav-warp {
 		width: $navMenuMin;
+		.logo img {
+			margin: 28px auto 25px;
+			width: 70%;
+		}
+	}
+	.el-submenu {
+		&.is-opened {
+			.el-submenu__title {
+				background-color: red !important;
+			}
+		}
+	}
+	.el-menu--vertical {
+		.el-menu {
+			background-color: red !important;
+		}
+		.el-menu-item:hover {
+			line-height: 56px;
+		}
 	}
 }
 </style>
