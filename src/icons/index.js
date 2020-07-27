@@ -11,7 +11,7 @@ require.context(‘./svg’, false, /\.svg$/) 参数说明：
  */
 const req = require.context('./svg', false, /\.svg$/) //读取结尾为.svg的文件
 const requireAll = requireContext => {
-    // console.log(requireContext.keys())
+    // console.log(requireContext.keys()) 
     return requireContext.keys().map(requireContext)
 }
 requireAll(req)

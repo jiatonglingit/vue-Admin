@@ -1,5 +1,5 @@
 const state = {
-    isCollapse: JSON.parse(sessionStorage.getItem('isCollapse')) || false
+    isCollapse: false || JSON.parse(sessionStorage.getItem('isCollapse'))
 }
 const getters = {
         isCollapse: state => state.isCollapse
