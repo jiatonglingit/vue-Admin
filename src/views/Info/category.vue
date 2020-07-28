@@ -1,6 +1,6 @@
 <template>
   <div id="category">
-    <el-button type="danger" @click="addFirst">添加一级分类</el-button>
+    <el-button type="danger" @click="addFirst({type: 'category_first_add'})">添加一级分类</el-button>
     <hr class="hr-e9e9e9" />
     <div>
       <el-row :gutter="30">
@@ -12,7 +12,12 @@
                 <svg-icon icon-class="plus"></svg-icon>
                 {{firstItem.category_name}}
                 <div class="button-group">
-                  <el-button size="mini" type="danger" round>编辑</el-button>
+                  <el-button
+                    size="mini"
+                    type="danger"
+                    @click="editCategory({data: firstItem, type: 'category_first_edit'})"
+                    round
+                  >编辑</el-button>
                   <el-button size="mini" type="success" round>添加子级</el-button>
                   <el-button size="mini" round @click="deleteCategory(firstItem.id)">删除</el-button>
                 </div>
@@ -53,7 +58,8 @@ import { global } from "@/utils/global";
 import {
   AddFirstCategory,
   getInfoCategoryAll,
-  DelateCategoryAll
+  DelateCategoryAll,
+  EditCategory
 } from "@/api/news";
 import { reactive, ref, onMounted } from "@vue/composition-api";
 export default {
@@ -64,16 +70,28 @@ export default {
     const category_children_input = ref(true);
     const button_loading = ref(false);
     const deleteId = ref("");
+    const subit_button_type = ref("");
     //对象
     const form = reactive({
       categoryName: "",
       setCategoryName: ""
     });
     const category = reactive({
-      item: []
+      item: [],
+      current: []
     });
     //methods
+    //提交确定
     const submit = () => {
+      if (subit_button_type.value == "category_first_add") {
+        addFirstCategory();
+      }
+      if (subit_button_type.value == "category_first_edit") {
+        editFirstCategory();
+      }
+    };
+    //添加一级分类标题
+    const addFirstCategory = () => {
       if (form.categoryName !== "") {
         AddFirstCategory({ categoryName: form.categoryName })
           .then(response => {
@@ -104,15 +122,18 @@ export default {
         button_loading.value = true;
       }
     };
-    const addFirst = () => {
+    const addFirst = params => {
+      subit_button_type.value = params.type;
       category_first_input.value = true;
       category_children_input.value = false;
     };
+    //鼠标失去焦点
     const onBlur = () => {
       if (form.categoryName == "") {
         button_loading.value = false;
       }
     };
+    //删除
     const deleteCategory = categoryId => {
       deleteId.value = categoryId;
       confirm({
@@ -140,18 +161,40 @@ export default {
         id: "111"
       });
     };
-    const deleteCategoryById = () => {
-      // DelateCategoryAll({ categoryId: deleteId.value })
-      //   .then(response => {
-      //     console.log(response);
-      //     if (data.resCode === 0) {
-      //       root.$message({
-      //         message: data.message,
-      //         type: "success"
-      //       });
-      //     }
-      //   })
-      //   .catch(error => {});
+    //一级分类编辑
+    const editCategory = params => {
+      subit_button_type.value = params.type;
+      category_children_input.value = false;
+      // console.log(params);
+      // 一级名称输入还原名称
+      form.categoryName = params.data.category_name;
+      // 储存当前数据对象
+      category.current = params.data;
+    };
+    const editFirstCategory = () => {
+      if (category.current.length == 0) {
+        root.$message({
+          message: "未选择分类！！",
+          type: "error"
+        });
+        return false;
+      }
+      let requestData = {
+        id: category.current.id,
+        categoryName: form.categoryName
+      };
+      //一级分类编辑提交方法
+      EditCategory(requestData).then(response => {
+        let responseData = response.data;
+        root.$message({
+          message: responseData.message,
+          type: "success"
+        });
+        category.current.category_name = responseData.data.data.categoryName;
+        // 清空输入框
+        form.categoryName = "";
+        category.current = [];
+      });
     };
 
     /**
@@ -171,14 +214,14 @@ export default {
       deleteId,
       category_first_input,
       category_children_input,
-      deleteCategoryById,
       button_loading,
       category,
       form,
       submit,
       onBlur,
       deleteCategory,
-      addFirst
+      addFirst,
+      editCategory
     };
   }
 };

@@ -33,3 +33,13 @@ export function DelateCategoryAll(data) {
         data
     })
 }
+/**
+ * 修改分类
+ */
+export function EditCategory(data) {
+    return service.request({
+        method: "post",
+        url: "/news/editCategory/",
+        data
+    })
+}
