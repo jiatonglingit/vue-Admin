@@ -55,16 +55,18 @@
 </template>
 <script>
 import { global } from "@/utils/global";
+// import { common } from "@/api/common";
 import {
   AddFirstCategory,
   getInfoCategoryAll,
   DelateCategoryAll,
   EditCategory
 } from "@/api/news";
-import { reactive, ref, onMounted } from "@vue/composition-api";
+import { reactive, ref, onMounted, watch } from "@vue/composition-api";
 export default {
   setup(props, { root }) {
     const { confirm } = global();
+    // const { getInfoCategory, categoryItem } = common();
     //属性
     const category_first_input = ref(true);
     const category_children_input = ref(true);
@@ -196,17 +198,24 @@ export default {
         category.current = [];
       });
     };
-
+    // watch(
+    //   () => categoryItem.item,
+    //   value => {
+    //     // console.log(value);
+    //     category.item = value;
+    //   }
+    // );
     /**
      * 生命周期
      */
     // 挂载完成时执行，（页面DOM元素完成时，实例完成）
     onMounted(() => {
-      getInfoCategoryAll({})
+      // getInfoCategory();//第一种方式
+      root.$store
+        .dispatch("common/getInfoCategory")
         .then(response => {
-          // console.log(response.data.data);
-          let data = response.data.data;
-          category.item = data;
+          // console.log(response);
+          category.item = response;
         })
         .catch(error => {});
     });

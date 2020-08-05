@@ -7,10 +7,9 @@
           <div class="warp-content">
             <el-select v-model="category_value" placeholder="请选择" style="width: 100%;">
               <el-option
-                v-for="item in options"
+                v-for="item in options.category"
                 :key="item.id"
-                :label="item.label"
-                :value="item.value"
+                :value="item.category_name"
               ></el-option>
             </el-select>
           </div>
@@ -102,13 +101,14 @@
 import { global } from "@/utils/global";
 import DialogInfo from "./dialog/info";
 import { reactive, ref, watch, onMounted } from "@vue/composition-api";
-
+import { common } from "@/api/common";
 export default {
   name: "info",
 
   components: { DialogInfo },
   setup(props, { root }) {
     const { str, confirm } = global();
+    const { getInfoCategory, categoryItem } = common();
     //基础数据
     const search_key = ref("id");
     const category_value = ref("");
@@ -116,16 +116,9 @@ export default {
     const search_keyWork = ref("");
     const dialog_info = ref(false);
     //对象数据
-    const options = reactive([
-      {
-        value: 1,
-        label: "国际信息"
-      },
-      {
-        value: 1,
-        label: "国内信息"
-      }
-    ]);
+    const options = reactive({
+      category: []
+    });
     const search_option = reactive([
       { value: "id", label: "ID" },
       { value: "title", label: "标题" }
@@ -187,6 +180,16 @@ export default {
     const handleCurrentChange = val => {
       console.log(val);
     };
+    onMounted(() => {
+      getInfoCategory();
+    });
+    watch(
+      () => categoryItem.item,
+      value => {
+        // console.log(value);
+        options.category = value;
+      }
+    );
     return {
       //ref
       category_value,

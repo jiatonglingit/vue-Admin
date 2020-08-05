@@ -11,7 +11,17 @@ export function AddFirstCategory(data) {
     })
 }
 /**
- * 获取新闻
+ * 获取分类
+ */
+export function GetCategory(data) {
+    return service.request({
+        method: "post",
+        url: "/news/getCategory/",
+        data
+    })
+}
+/**
+ * 获取新闻分类（包含子级）
  */
 export function getInfoCategoryAll(data) {
     return service.request({
